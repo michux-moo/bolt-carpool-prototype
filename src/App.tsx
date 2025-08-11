@@ -288,14 +288,62 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          {/* Navigation */}
-          <button
-            onClick={() => setCurrentView('home')}
-            className="flex items-center text-gray-600 hover:text-gray-800 mb-6 transition-colors"
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Back to Home
-          </button>
+          {/* Compact Event Header - 75% space reduction */}
+          <div className="bg-white shadow-sm border-b">
+            <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <button
+                    onClick={() => setCurrentView('home')}
+                    className="flex items-center text-gray-600 hover:text-gray-900 flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Back</span>
+                  </button>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-xl font-bold text-gray-900 truncate">{selectedEvent.name}</h1>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1 text-blue-500" />
+                        <span className="hidden sm:inline">{new Date(selectedEvent.date).toLocaleDateString()}</span>
+                        <span className="sm:hidden">{new Date(selectedEvent.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1 text-blue-500" />
+                        <span>{selectedEvent.time}</span>
+                      </div>
+                      <div className="flex items-center truncate">
+                        <MapPin className="w-3 h-3 mr-1 text-blue-500 flex-shrink-0" />
+                        <span className="truncate">{selectedEvent.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
+                  <button
+                    onClick={() => setCurrentView('create-carpool')}
+                    className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Create</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}?event=${selectedEvent.id}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      alert('Event link copied to clipboard!');
+                    }}
+                    className="flex items-center px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Share</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Event Header */}
           <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
@@ -430,6 +478,66 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
         <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Compact Carpool Header - 75% space reduction */}
+          <div className="bg-white shadow-sm border-b">
+            <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  <button
+                    onClick={() => setCurrentView('event-detail')}
+                    className="flex items-center text-gray-600 hover:text-gray-900 flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Back</span>
+                  </button>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center">
+                      <Car className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" />
+                      <h1 className="text-xl font-bold text-gray-900 truncate">{selectedCarpool.name}</h1>
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                      <div className="flex items-center">
+                        <Users className="w-3 h-3 mr-1 text-green-500" />
+                        <span>{selectedCarpool.participants.length}/{selectedCarpool.maxCapacity}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1 text-blue-500" />
+                        <span className="capitalize">{selectedCarpool.type.replace('-', ' ')}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1 text-purple-500" />
+                        <span className="hidden sm:inline">{new Date(selectedEvent.date).toLocaleDateString()}</span>
+                        <span className="sm:hidden">{new Date(selectedEvent.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
+                  <button
+                    onClick={() => setCurrentView('join-carpool')}
+                    className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    <UserPlus className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Join</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}?carpool=${selectedCarpool.id}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      alert('Carpool link copied to clipboard!');
+                    }}
+                    className="flex items-center px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Share</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Navigation */}
           <button
             onClick={() => setCurrentView('event-detail')}
