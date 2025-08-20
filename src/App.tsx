@@ -345,8 +345,8 @@ function App() {
             </div>
           </div>
 
-          {/* Event Header */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
+          {/* Event Header */} 
+          {/* <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
             <div className="text-center mb-6">
               <Calendar className="w-16 h-16 text-purple-600 mx-auto mb-4" />
               <h1 className="text-4xl font-bold text-gray-800 mb-2">{selectedEvent.name}</h1>
@@ -377,7 +377,7 @@ function App() {
               <Plus className="w-5 h-5 mr-2" />
               Create New Carpool
             </button>
-          </div>
+          </div> */}
 
           {/* Carpools */}
           <div>
