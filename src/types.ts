@@ -3,6 +3,8 @@ export interface Event {
   name: string;
   date: string;
   time: string;
+  endTime?: string;
+  endDate?: string;
   location: string;
   description: string;
   createdBy: string;
