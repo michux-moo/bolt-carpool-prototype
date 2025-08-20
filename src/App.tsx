@@ -68,6 +68,22 @@ function App() {
     setShowEventForm(false);
   };
 
+  const handleStartTimeChange = (startTime: string) => {
+    setEventForm({...eventForm, time: startTime});
+    
+    // Auto-set end time to 1 hour after start time
+    if (startTime) {
+      const [hours, minutes] = startTime.split(':').map(Number);
+      const startDate = new Date();
+      startDate.setHours(hours, minutes, 0, 0);
+      
+      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+      const endTimeString = endDate.toTimeString().slice(0, 5); // Format as HH:MM
+      
+      setEventForm(prev => ({...prev, time: startTime, endTime: endTimeString}));
+    }
+  };
+
   const handleCarpoolSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -318,7 +334,7 @@ function App() {
                       <input
                         type="time"
                         value={eventForm.time}
-                        onChange={(e) => setEventForm({...eventForm, time: e.target.value})}
+                        onChange={(e) => handleStartTimeChange(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         required
                       />
