@@ -10,7 +10,9 @@ import {
   Button,
   Grid,
   Fab,
-  Stack
+  Stack,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -18,10 +20,13 @@ import {
   DirectionsCar as CarIcon,
   Group as GroupIcon
 } from '@mui/icons-material';
-import { Event, Carpool } from './types';
+import { Event, Carpool, Participant } from './types';
+import { CreateEventModal } from './components/CreateEventModal';
+import { CreateCarpoolModal } from './components/CreateCarpoolModal';
+import { EventDetailsModal } from './components/EventDetailsModal';
 
 function App() {
-  const [events] = useState<Event[]>([
+  const [events, setEvents] = useState<Event[]>([
     {
       id: '1',
       name: 'Tech Conference 2025',
@@ -44,7 +49,7 @@ function App() {
     }
   ]);
 
-  const [carpools] = useState<Carpool[]>([
+  const [carpools, setCarpools] = useState<Carpool[]>([
     {
       id: '1',
       eventId: '1',
@@ -73,6 +78,72 @@ function App() {
       createdAt: '2025-01-11T09:00:00Z'
     }
   ]);
+
+  // Modal states
+  const [createEventOpen, setCreateEventOpen] = useState(false);
+  const [createCarpoolOpen, setCreateCarpoolOpen] = useState(false);
+  const [eventDetailsOpen, setEventDetailsOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  
+  // Notification state
+  const [notification, setNotification] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  // Event handlers
+  const handleCreateEvent = (eventData: Omit<Event, 'id' | 'createdAt'>) => {
+    const newEvent: Event = {
+      ...eventData,
+      id: `event-${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+    setEvents(prev => [...prev, newEvent]);
+    showNotification('Event created successfully!', 'success');
+  };
+
+  const handleCreateCarpool = (carpoolData: Omit<Carpool, 'id' | 'createdAt' | 'participants'>) => {
+    const newCarpool: Carpool = {
+      ...carpoolData,
+      id: `carpool-${Date.now()}`,
+      participants: [],
+      createdAt: new Date().toISOString()
+    };
+    setCarpools(prev => [...prev, newCarpool]);
+    showNotification('Carpool created successfully!', 'success');
+  };
+
+  const handleViewEventDetails = (event: Event) => {
+    setSelectedEvent(event);
+    setEventDetailsOpen(true);
+  };
+
+  const handleJoinCarpool = (eventId: string) => {
+    // For now, just open the create carpool modal
+    setCreateCarpoolOpen(true);
+    showNotification('Join carpool functionality coming soon!', 'info');
+  };
+
+  const handleManageCarpool = (carpoolId: string) => {
+    showNotification('Carpool management functionality coming soon!', 'info');
+  };
+
+  const showNotification = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
+    setNotification({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const handleCloseNotification = () => {
+    setNotification(prev => ({ ...prev, open: false }));
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -109,7 +180,11 @@ function App() {
               <Typography variant="h5" component="h2">
                 Upcoming Events
               </Typography>
-              <Button variant="contained" startIcon={<AddIcon />}>
+              <Button 
+                variant="contained" 
+                startIcon={<AddIcon />}
+                onClick={() => setCreateEventOpen(true)}
+              >
                 Create Event
               </Button>
             </Box>
@@ -139,10 +214,18 @@ function App() {
                         {event.description}
                       </Typography>
                       <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                        <Button size="small" variant="outlined">
+                        <Button 
+                          size="small" 
+                          variant="outlined"
+                          onClick={() => handleViewEventDetails(event)}
+                        >
                           View Details
                         </Button>
-                        <Button size="small" variant="contained">
+                        <Button 
+                          size="small" 
+                          variant="contained"
+                          onClick={() => handleJoinCarpool(event.id)}
+                        >
                           Join Carpool
                         </Button>
                       </Box>
@@ -159,7 +242,11 @@ function App() {
               <Typography variant="h5" component="h2">
                 Active Carpools
               </Typography>
-              <Button variant="outlined" startIcon={<AddIcon />}>
+              <Button 
+                variant="outlined" 
+                startIcon={<AddIcon />}
+                onClick={() => setCreateCarpoolOpen(true)}
+              >
                 Create Carpool
               </Button>
             </Box>
@@ -195,10 +282,18 @@ function App() {
                           </Typography>
                         </Box>
                         <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                          <Button size="small" variant="outlined">
+                          <Button 
+                            size="small" 
+                            variant="outlined"
+                            onClick={() => handleViewEventDetails(events.find(e => e.id === carpool.eventId)!)}
+                          >
                             View Details
                           </Button>
-                          <Button size="small" variant="contained">
+                          <Button 
+                            size="small" 
+                            variant="contained"
+                            onClick={() => handleManageCarpool(carpool.id)}
+                          >
                             Manage
                           </Button>
                         </Box>
@@ -216,6 +311,7 @@ function App() {
       <Fab
         color="primary"
         aria-label="add"
+        onClick={() => setCreateEventOpen(true)}
         sx={{
           position: 'fixed',
           bottom: 16,
@@ -224,6 +320,35 @@ function App() {
       >
         <AddIcon />
       </Fab>
+
+      {/* Modals */}
+      <CreateEventModal
+        open={createEventOpen}
+        onClose={() => setCreateEventOpen(false)}
+        onCreateEvent={handleCreateEvent}
+      />
+
+      <CreateCarpoolModal
+        open={createCarpoolOpen}
+        onClose={() => setCreateCarpoolOpen(false)}
+        onCreateCarpool={handleCreateCarpool}
+        events={events}
+      />
+
+      <EventDetailsModal
+        open={eventDetailsOpen}
+        onClose={() => setEventDetailsOpen(false)}
+        event={selectedEvent}
+        carpools={carpools}
+        onJoinCarpool={handleJoinCarpool}
+      />
+
+      {/* Notifications */}
+      <Snackbar open={notification.open} autoHideDuration={4000} onClose={handleCloseNotification}>
+        <Alert onClose={handleCloseNotification} severity={notification.severity}>
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
