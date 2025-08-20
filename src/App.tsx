@@ -280,9 +280,9 @@ function App() {
                         <Button 
                           size="small" 
                           variant="contained"
-                          onClick={() => handleManageCarpool(carpool.id)}
+                          onClick={() => handleJoinCarpool(event.id)}
                         >
-                          {carpool.participants.some(p => p.email === currentUserEmail) ? 'Manage' : 'View Details'}
+                          Join Carpool
                         </Button>
                       </Box>
                     </CardContent>
