@@ -381,7 +381,7 @@ function App() {
 
           {/* Carpools */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 mt-16">Carpools for this Event</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-8 mt-8">Carpools for this Event</h2>
             {eventCarpools.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center shadow-lg">
                 <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
