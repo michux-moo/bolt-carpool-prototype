@@ -24,6 +24,8 @@ import { Event, Carpool, Participant } from './types';
 import { CreateEventModal } from './components/CreateEventModal';
 import { CreateCarpoolModal } from './components/CreateCarpoolModal';
 import { EventDetailsModal } from './components/EventDetailsModal';
+import { JoinCarpoolModal } from './components/JoinCarpoolModal';
+import { CarpoolDetailsModal } from './components/CarpoolDetailsModal';
 
 function App() {
   const [events, setEvents] = useState<Event[]>([
@@ -84,6 +86,12 @@ function App() {
   const [createCarpoolOpen, setCreateCarpoolOpen] = useState(false);
   const [eventDetailsOpen, setEventDetailsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [joinCarpoolOpen, setJoinCarpoolOpen] = useState(false);
+  const [carpoolDetailsOpen, setCarpoolDetailsOpen] = useState(false);
+  const [selectedCarpool, setSelectedCarpool] = useState<Carpool | null>(null);
+  
+  // Current user (in a real app, this would come from authentication)
+  const currentUserEmail = 'user@example.com';
   
   // Notification state
   const [notification, setNotification] = useState<{
@@ -124,13 +132,61 @@ function App() {
   };
 
   const handleJoinCarpool = (eventId: string) => {
-    // For now, just open the create carpool modal
-    setCreateCarpoolOpen(true);
-    showNotification('Join carpool functionality coming soon!', 'info');
+    // Find available carpools for this event
+    const eventCarpools = carpools.filter(c => c.eventId === eventId);
+    if (eventCarpools.length === 0) {
+      setCreateCarpoolOpen(true);
+      showNotification('No carpools available. Create one!', 'info');
+    } else {
+      // For now, open the first available carpool
+      const availableCarpool = eventCarpools.find(c => c.maxCapacity > c.participants.length);
+      if (availableCarpool) {
+        setSelectedCarpool(availableCarpool);
+        setJoinCarpoolOpen(true);
+      } else {
+        showNotification('All carpools for this event are full', 'warning');
+      }
+    }
   };
 
   const handleManageCarpool = (carpoolId: string) => {
-    showNotification('Carpool management functionality coming soon!', 'info');
+    const carpool = carpools.find(c => c.id === carpoolId);
+    if (carpool) {
+      setSelectedCarpool(carpool);
+      setCarpoolDetailsOpen(true);
+    }
+  };
+
+  const handleJoinCarpoolSubmit = (carpoolId: string, participantData: Omit<Participant, 'id' | 'joinedAt'>) => {
+    const newParticipant: Participant = {
+      ...participantData,
+      id: `participant-${Date.now()}`,
+      joinedAt: new Date().toISOString()
+    };
+
+    setCarpools(prev => prev.map(carpool => 
+      carpool.id === carpoolId 
+        ? { ...carpool, participants: [...carpool.participants, newParticipant] }
+        : carpool
+    ));
+
+    showNotification('Successfully joined the carpool!', 'success');
+  };
+
+  const handleLeaveCarpool = (carpoolId: string, participantId: string) => {
+    setCarpools(prev => prev.map(carpool => 
+      carpool.id === carpoolId 
+        ? { ...carpool, participants: carpool.participants.filter(p => p.id !== participantId) }
+        : carpool
+    ));
+
+    showNotification('You have left the carpool', 'info');
+    setCarpoolDetailsOpen(false);
+  };
+
+  const handleViewCarpoolDetails = (carpool: Carpool) => {
+    setSelectedCarpool(carpool);
+    setJoinCarpoolOpen(true);
   };
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
@@ -224,9 +280,9 @@ function App() {
                         <Button 
                           size="small" 
                           variant="contained"
-                          onClick={() => handleJoinCarpool(event.id)}
+                          onClick={() => handleManageCarpool(carpool.id)}
                         >
-                          Join Carpool
+                          {carpool.participants.some(p => p.email === currentUserEmail) ? 'Manage' : 'View Details'}
                         </Button>
                       </Box>
                     </CardContent>
@@ -343,6 +399,23 @@ function App() {
         onJoinCarpool={handleJoinCarpool}
       />
 
+      <JoinCarpoolModal
+        open={joinCarpoolOpen}
+        onClose={() => setJoinCarpoolOpen(false)}
+        carpool={selectedCarpool}
+        currentUserEmail={currentUserEmail}
+        onJoinCarpool={handleJoinCarpoolSubmit}
+      />
+
+      <CarpoolDetailsModal
+        open={carpoolDetailsOpen}
+        onClose={() => setCarpoolDetailsOpen(false)}
+        carpool={selectedCarpool}
+        event={selectedCarpool ? events.find(e => e.id === selectedCarpool.eventId) || null : null}
+        currentUserEmail={currentUserEmail}
+        onLeaveCarpool={handleLeaveCarpool}
+        onJoinCarpool={handleViewCarpoolDetails}
+      />
       {/* Notifications */}
       <Snackbar open={notification.open} autoHideDuration={4000} onClose={handleCloseNotification}>
         <Alert onClose={handleCloseNotification} severity={notification.severity}>
