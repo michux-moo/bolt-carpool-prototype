@@ -328,10 +328,16 @@ function App() {
                         </Typography>
                         <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
                           <Typography variant="body2">
-                            🚗 {driverCount} driver{driverCount !== 1 ? 's' : ''}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <CarIcon sx={{ fontSize: 16 }} />
+                              {driverCount} driver{driverCount !== 1 ? 's' : ''}
+                            </Box>
                           </Typography>
                           <Typography variant="body2">
-                            👥 {passengerCount} passenger{passengerCount !== 1 ? 's' : ''}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <GroupIcon sx={{ fontSize: 16 }} />
+                              {passengerCount} passenger{passengerCount !== 1 ? 's' : ''}
+                            </Box>
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             ({carpool.participants.length}/{carpool.maxCapacity})
