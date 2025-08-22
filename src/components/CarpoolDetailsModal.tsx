@@ -83,8 +83,8 @@ export const CarpoolDetailsModal: React.FC<CarpoolDetailsModalProps> = ({
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'drive-both': return 'primary';
-      case 'drive-to': return 'secondary';
-      case 'drive-from': return 'info';
+      case 'drive-to': return 'secondary'; 
+      case 'drive-from': return 'primary';
       case 'passenger': return 'default';
       default: return 'default';
     }

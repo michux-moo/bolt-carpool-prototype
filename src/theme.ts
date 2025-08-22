@@ -3,14 +3,14 @@ import { createTheme } from '@mui/material/styles';
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#3b82f6', // Blue-500 (similar to Tailwind's blue-500)
-      light: '#60a5fa', // Blue-400
-      dark: '#1d4ed8', // Blue-700
+      main: '#4a0d67', // Indigo
+      light: '#8332ac', // Grape
+      dark: '#2d0540', // Darker indigo
     },
     secondary: {
-      main: '#6366f1', // Indigo-500
-      light: '#818cf8', // Indigo-400
-      dark: '#4338ca', // Indigo-700
+      main: '#07beb8', // Light sea green
+      light: '#73eedc', // Turquoise
+      dark: '#059691', // Darker sea green
     },
     error: {
       main: '#ef4444', // Red-500
